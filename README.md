@@ -1,4 +1,6 @@
 # HI3519DV500 人脸识别特征提取模型开发总结
+## To my ai assistant
+你当前在个项目的目录是一个HI3519DV500设备的人脸检测模型开发的目录，这个目录的环境位于一个ubuntu18的docker内，通过挂载到docker的/workspace的，而你位于宿主机，你可以修改这些文件，但没有执行的环境，所以需要执行时让我来在docker执行，请你先阅读项目代码和所有文档。
 
 ## 1. 项目简介
 本项目基于海思 SVP ACL (Ascend Computing Language) 接口，在 HI3519DV500 芯片上部署和运行基于 YOLOv8 架构的自定义人脸检测模型 (`yolov8n-face`)。项目实现了从 ONNX 模型转换、图片预处理、NPU 推理到 CPU 后处理（解码、NMS、画框）的完整端到端流程。
@@ -91,3 +93,8 @@ cd /workspace/1_classification/yolo/out
 运行成功后，当前 `out/` 目录下会生成：
 - `yolov8_face_detResult.txt`: 包含检测到的 bounding box 坐标及置信度。
 - `out_img_yolov8_face.jpg`: 带有检测框的可视化图片。
+
+## 额外信息
+### NPU 已知算子
+- [ERROR][ParseLayer][183] Unknown Op[GatherND]. Known Ops[Abs, AbsVal, Acos, Acosh, Add, And, ArgMax, ArgMin, Asin, Asinh, Atan, Atanh, AveragePool, BNLL, BatchNorm, BatchNormalization, Bias, BinaryMath, BitShift, CReLU, Ceil, Celu, Clip, Cmp, Compress, Concat, CondEnd, ConstantOfShape, ConvTranspose, Convolution, Cos, Cosh, Crop, CumSum, Custom, DecBBox, Deconvolution, DepthToSpace, DepthwiseConv, Det, DetectionOutput, Div, Dlut, Dropout, ELU, Einsum, ElseBegin, Eltwise, Equal, Erf, Exp, Expand, Extract, ExtractSlice, EyeLike, Filter, FilterBox, Flatten, Floor, GRU, Gather, GatherElements, Gelu2, Gemm, GlobalAveragePool, GlobalLpPool, GlobalMaxPool, Greater, GreaterOrEqual, GridSample, GridSampleXDec, GroupNorm, GroupNormalization, HardSigmoid, Hardmax, Hswish, Identity, If, InnerProduct, Input, InstanceNormalization, Interp, InverseSigmoid, LRN, LSTM, LayerNorm, LayerNormalization, LeakyRelu, Less, LessOrEqual, Log, Logical, Loop, LpNorm, LpPool, MVN, MatMul, Max, MaxPool, MaxRoiPool, MaxUnpool, Mean, MeanVarianceNormalization, Min, Mish, Mod, Mul, MulReduceSum, NMS, Neg, NonMaxSuppression, NonZero, Nop, Norm, Normalize, Not, OneHot, Or, PReLU, PRelu, PSROI, PSROIPooling, Pad, PassThrough, Passthrough, Permute, Pooling, PoolingMask, PosEncode, Power, QLinearMatMul, Quant, RNN, ROIPooling, RReLU, Range, ReLU, ReLU6, Reciprocal, ReduceL1, ReduceL2, ReduceLogSum, ReduceLogSumExp, ReduceMax, ReduceMean, ReduceMin, ReduceProd, ReduceSum, ReduceSumSquare, Reduction, Reorg, Reshape, Resize, Reverse, RoiAlign, Roll, RotaryPosEncode, Round, SPP, Scale, Scan, Scatter, ScatterElements, ScatterND, Selu, SequenceConstruct, Shape, Shrink, ShuffleChannel, Sigmoid, Sign, Silence, Sin, Sinh, Size, Slice, Softmax, Softplus, Softsign, Sort, SpaceToDepth, Split, Sqrt, Squeeze, Sub, Sum, Swish, Tan, TanH, Tanh, ThenEnd, Threshold, ThresholdedRelu, Tile, TopK, Transpose, Unique, Unpooling, Unsqueeze, Upsample, VectorCombine, VectorOps, Where, WinPartition, WinPartitionReverse, Xor], ExtendedOps[].
+
