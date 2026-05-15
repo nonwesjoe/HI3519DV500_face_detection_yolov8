@@ -49,27 +49,27 @@ yolo/
 ```
 
 ## 4. 核心代码逻辑说明
-为了适配自定义的 `yolov8n-face` 模型，我们在官方样例的基础上进行了精简和修改，主要集中在 `8_face` 模式：
-1. **模型输出解析**: 原始 `yolov8n-face.onnx` 的输出维度为 `(1, 20, 8400)`。其中 20 个通道分别代表：4个框坐标 + 1个类别置信度(人脸) + 15个关键点坐标。
-2. **CPU 后处理 (`model_process.cpp`)**:
-   - `FilterYolov8FaceBox`: 专门针对 Face 模型设计的解码函数。由于导出的 ONNX 在类别分支末端缺失 Sigmoid 激活，代码中手动添加了 `1.0f / (1.0f + exp(-val))` 进行概率转换。同时，严格限制只读取第 5 个通道作为唯一类别（classId = 0），避免了官方 80 类别硬编码导致的内存越界问题。
+为了适配自定义的 `yolov8n-face` 模型并保持代码的极简与高效，我们对官方多模型混合样例进行了彻底的重构和精简，仅保留了核心的面部检测逻辑：
+1. **纯净的人脸检测流程**: 移除了原版样例中为了兼容 YOLOv5、YOLOv7、YOLOX 等其他模型而存在的冗余解码与后处理代码，统一使用专门针对人脸模型的 `OutputModelResultYoloV8Face`。
+2. **模型输出解析**: 原始 `yolov8n-face.onnx` 的输出维度为 `(1, 20, 8400)`。其中 20 个通道分别代表：4个框坐标 + 1个类别置信度(人脸) + 15个关键点坐标。
+3. **CPU 后处理 (`model_process.cpp`)**:
+   - `FilterYolov8FaceBox`: 专门针对 Face 模型设计的解码函数。因为只检测单一人脸类别，我们将类别映射列表精简为 `{ "face" }`，消除了官方 80 类别硬编码可能导致的内存越界隐患。代码严格按 stride 提取第 5 个通道作为置信度，并直接生成人脸坐标信息。
    - `OutputModelResultYoloV8Face`: 整合了解码、NMS (非极大值抑制) 和结果保存、画框的流程。
-3. **硬件 RPN vs CPU 后处理**:
-   - 本项目使用的是**纯 CPU 后处理**路线，因此**不需要**对 YOLO 源码打 `0001-yolov8-rpn.patch`。直接使用最原始的 ONNX 模型进行转换即可。
+4. **硬件 RPN vs CPU 后处理**:
+   - 本项目使用的是**纯 CPU 后处理**路线，因此**不需要**对 YOLO 源码打 `0001-yolov8-rpn.patch`。直接使用最原始的 ONNX 模型进行转换即可。同时，由于去除了硬件 RPN 依赖，相关的硬件传参接口（如 `SetDetParas`）也被彻底移除，使得代码逻辑更加清晰直接。
 
 ## 5. 快速启动指南 (Docker 环境)
 
 ### 第一步：准备数据
 如果需要更换测试图片，请使用 Python 脚本将 JPG 转换为模型所需的 BIN 格式：
 ```bash
-cd /workspace/1_classification/yolo/data
-python3.7.5 ../script/transferPic.py 8_cpu  # 生成 640x640 分辨率的输入
+cd data
+python3.7.5 ../script/transferPic.py  # 生成 640x640 分辨率的输入
 ```
 
 ### 第二步：模型转换 (ONNX -> OM)
 使用 `atc` 工具将 ONNX 转换为适配 HI3519DV500 的离线模型。该过程会读取 `insert_op.cfg` 进行 AIPP 配置。
 ```bash
-cd /workspace/1_classification/yolo
 bash script/compile_model.sh
 ```
 *成功后会在 `model/` 目录下生成 `yolov8_face_original.om`。*
@@ -77,16 +77,14 @@ bash script/compile_model.sh
 ### 第三步：编译 C++ 工程
 运行一键编译脚本。如果遇到 `CMakeLists.txt` 缺失的报错，请确保 `src/CMakeLists.txt` 文件存在。
 ```bash
-cd /workspace/1_classification/yolo
-rm -rf out/*   # 清理旧产物
 ./build.sh     # 编译生成可执行文件
 ```
 
 ### 第四步：执行推理测试
 进入产物目录，指定 `8_face` 参数运行仿真可执行文件：
 ```bash
-cd /workspace/1_classification/yolo/out
-./func_main 8_face
+cd out
+./func_main
 ```
 
 ### 第五步：查看结果

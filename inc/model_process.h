@@ -77,8 +77,6 @@ public:
 
     Result CreateTaskBufAndWorkBuf();
 
-    Result SetDetParas(int32_t modelId);
-
     /**
     * @brief destroy input resource
     */
@@ -126,15 +124,8 @@ private:
 
     Result ClearOutputStrideInvalidBuf(std::vector<int8_t>& buffer, size_t index) const;
 
-    Result SetDetParas(const std::vector<float>& detPara);
-    void OutputModelResultYoloV(int32_t modelId, const std::string& imgName) const;
-    void OutputModelResultYoloX(int32_t modelId, const std::string& imgName) const;
-    void OutputModelResultYoloVCpu(int32_t modelId, const std::string& imgName) const;
-    void OutputModelResultYoloV8Cpu(int32_t modelId, const std::string& imgName) const;
     void OutputModelResultYoloV8Face(int32_t modelId, const std::string& imgName) const;
-    void FilterYolov5Box(std::vector<std::vector<float>>& vaildBox) const;
-    void ProcessPerDectection(size_t detectIdx, std::vector<std::vector<float>>& vaildBox) const;
-    void FilterYolov8Box(int32_t modelId, std::vector<std::vector<float>>& vaildBox) const;
+
     void FilterYolov8FaceBox(int32_t modelId, std::vector<std::vector<float>>& vaildBox) const;
 
     uint32_t executeNum_ { 0 };
@@ -151,20 +142,6 @@ private:
     bool isMultiThr {false};
     uint32_t rpnDataH {0};
     uint32_t rpnDataW {0};
-};
-constexpr uint8_t SCALE_SIZE = 3;
-constexpr uint8_t CLASS_NUM = 80;
-constexpr uint8_t OUT_PARM_NUM = 85; /* x, y, w,h, obj , class(80) */
-
-struct DetectionInnerParam {
-    float *outData { nullptr };
-    size_t detectIdx { 0 };
-    size_t wStrideOffset { 0 };
-    float scoreThr { 0.0f};
-    uint32_t outWidth { 0 };
-    uint32_t chnStep { 0 };
-    uint32_t outHeightIdx { 0 };
-    uint32_t objScoreOffset { 0 };
 };
 
 #endif // MODEL_PROCESS_H

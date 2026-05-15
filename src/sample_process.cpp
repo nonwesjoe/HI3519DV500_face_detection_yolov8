@@ -122,8 +122,8 @@ Result SampleProcess::Process()
         ret = modelProcess.CreateInputBuf(testFile[index]);
         CHECK_EXPS_RETURN(ret != SUCCESS, FAILED, "CreateInputBuf failed");
         if (!isCpuProcess_) {
-            ret = modelProcess.SetDetParas(modelId);
-            CHECK_EXPS_RETURN(ret != SUCCESS, FAILED, "SetDetParas failed");
+            ERROR_LOG("Only CPU process is supported for YOLOV8_FACE");
+            return FAILED;
         }
 
         ret = modelProcess.CreateTaskBufAndWorkBuf();
